@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formulário de Cadastro</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f2f5;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+
+        form {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            max-width: 400px;
+            width: 100%;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #555;
+        }
+
+        input[type="text"],
+        input[type="email"],
+        input[type="tel"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+
+        input[type="radio"] {
+            margin-right: 5px;
+        }
+
+          .radio-group {
+            margin-bottom: 15px;
+        }
+
+        .radio-group label {
+            display: inline-block;
+            margin-right: 10px;
+            color: #555;
+        }
+
+        .radio-group input[type="radio"] {
+            margin-right: 5px;
+            vertical-align: middle;
+        }
+
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100%;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        #lista-cadastrados {
+            margin-top: 20px;
+            list-style-type: none;
+            padding: 0;
+        }
+
+        #lista-cadastrados li {
+            background-color: #e7f3fe;
+            padding: 10px;
+            margin-bottom: 5px;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+    </style>
+</head>
+
+<body>
+<form id="cadastro-form">
+    <h1>Formulário de Cadastro</h1>
+
+    <label for="nome">Nome:</label>
+    <input type="text" id="nome" name="nome" required>
+
+    <label for="email">E-mail:</label>
+    <input type="email" id="email" name="email" required>
+
+    <label for="telefone">Telefone:</label>
+    <input type="tel" id="telefone" name="telefone">
+
+    <label>Quero ser do grupo:</label>
+    <div class="radio-group">
+        <input type="radio" id="justice" name="tipoGrupo" value="JUSTICE_LEAGUE">
+        <label for="justice">Liga da Justiça</label>
+
+        <input type="radio" id="avangers" name="tipoGrupo" value="AVANGERS">
+        <label for="avangers">Os Vingadores</label>
+    </div>
+
+    <button type="button" id="cadastrar">Cadastrar</button>
+    <button type="button" id="listar">Listar Cadastrados</button>
+
+    <ul id="lista-cadastrados">
+        <!-- Aqui você pode exibir a lista de cadastrados -->
+    </ul>
+</form>
+
+<script>
+    // Adicionando evento para o botão "Cadastrar"
+    document.getElementById("cadastrar").addEventListener("click", function () {
+        const nome = document.getElementById("nome").value;
+        const email = document.getElementById("email").value;
+        const telefone = document.getElementById("telefone").value;
+        const tipoGrupo = document.querySelector('input[name="tipoGrupo"]:checked')?.value;
+
+        if (!tipoGrupo) {
+            alert("Por favor, selecione um grupo.");
+            return;
+        }
+
+        const dados = {
+            nome: nome,
+            email: email,
+            telefone: telefone,
+            tipoGrupo: tipoGrupo
+        };
+
+        cadastrar(dados);
+    });
+
+    const url = "/jogadores";
+
+    function cadastrar(dados) {
+        fetch(url, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(dados)
+        })
+            .then(response => response.json())
+            .then(data => {
+                console.log(data);
+                alert("Cadastro realizado com sucesso!");
+                document.getElementById("cadastro-form").reset();
+            })
+            .catch(error => {
+                console.error(error);
+            });
+    }
+
+    // Adicionando evento para o botão "Listar Cadastrados"
+    document.getElementById("listar").addEventListener("click", function () {
+        carregarListaCadastros();
+    });
+
+    function carregarListaCadastros() {
+        fetch(url)
+            .then(response => response.json())
+            .then(data => {
+                const listaCadastros = document.getElementById("lista-cadastrados");
+                listaCadastros.innerHTML = ""; // Limpa a lista
+                data.forEach(pessoa => {
+                    const item = document.createElement("li");
+                    item.textContent = `Nome: ${pessoa.nome}, E-mail: ${pessoa.email},
+                    Telefone: ${pessoa.telefone}, Codiname: ${pessoa.codiname}, Grupo: ${pessoa.tipoGrupo}`;
+                    listaCadastros.appendChild(item);
+                });
+            })
+            .catch(error => {
+                console.error(error);
+            });
+    }
+</script>
+</body>
+
+</html>
